@@ -25,12 +25,12 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    if  (!q){
+    if (!q) {
         return;
     }
     int size = q->size;
     list_ele_t *iter = q->head;
-    for (int i = 0; i < size; i++){
+    for (int i = 0; i < size; i++) {
         free(iter->value);
         iter = iter->next;
     }
