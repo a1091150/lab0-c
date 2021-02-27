@@ -31,8 +31,10 @@ void q_free(queue_t *q)
     int size = q->size;
     list_ele_t *iter = q->head;
     for (int i = 0; i < size; i++) {
+        list_ele_t *next = iter->next;
         free(iter->value);
-        iter = iter->next;
+        free(iter);
+        iter = next;
     }
     free(q);
 }
@@ -46,13 +48,33 @@ void q_free(queue_t *q)
  */
 bool q_insert_head(queue_t *q, char *s)
 {
+    if (!q) {
+        return false;
+    }
+
     list_ele_t *newh;
-    /* TODO: What should you do if the q is NULL? */
     newh = malloc(sizeof(list_ele_t));
-    /* Don't forget to allocate space for the string and copy it */
-    /* What if either call to malloc returns NULL? */
-    newh->next = q->head;
-    q->head = newh;
+    if (!newh) {
+        return false;
+    }
+
+    size_t length = strlen(s) + 1;
+    newh->value = malloc(sizeof(char) * length);
+    if (!newh->value) {
+        free(newh);
+        return false;
+    }
+    memcpy(newh->value, s, length);
+
+    if (!q->head) {
+        q->head = newh;
+        q->tail = newh;
+    } else {
+        newh->next = q->head;
+        q->head = newh;
+    }
+
+    q->size++;
     return true;
 }
 
