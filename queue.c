@@ -197,9 +197,16 @@ void q_reverse(queue_t *q)
         char *tmp = next->value;
         next->value = prev->value;
         prev->value = tmp;
-        next = q->head->next;
-        prev = q->tail->prev;
+        next = next->next;
+        prev = prev->prev;
     }
+}
+
+int compare(const void *a, const void *b)
+{
+    char *ll = *(char **) a;
+    char *rr = *(char **) b;
+    return strcmp(ll, rr);
 }
 
 /*
@@ -209,6 +216,27 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
+    if (!q) {
+        return;
+    }
+
+    if (q->size == 0 || q->size == 1) {
+        return;
+    }
+
+    int size = q->size;
+    char *iter[size];
+
+    list_ele_t *foo = q->head;
+    for (int i = 0; i < size; i++) {
+        iter[i] = foo->value;
+        foo = foo->next;
+    }
+
+    qsort(iter, size, sizeof(char *), compare);
+    foo = q->head;
+    for (int i = 0; i < size; i++) {
+        foo->value = iter[i];
+        foo = foo->next;
+    }
 }
