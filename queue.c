@@ -202,11 +202,96 @@ void q_reverse(queue_t *q)
     }
 }
 
-int compare(const void *a, const void *b)
+// void merge(queue_t *left, queue_t*right){
+//     if (!left || !right){
+//         return;
+//     }
+//     list_ele_t *sourcehead = left->head->prev;
+//     list_ele_t *sourcetail = right->tail->next;
+
+//     int size = left->size + right->size;
+//     for (int i = 0; i < size; i++){
+
+//     }
+// }
+
+void merge(list_ele_t *left, list_ele_t *right, int lsize, int rsize)
 {
-    char *ll = *(char **) a;
-    char *rr = *(char **) b;
-    return strcmp(ll, rr);
+    int size = lsize + rsize;
+    if (lsize == 0 || rsize == 0 || size <= 1) {
+        return;
+    }
+
+    // list_ele_t *sourceleft = left->prev;
+    // list_ele_t *sourcetail = right->next;
+    // list_ele_t *head = NULL;
+    // list_ele_t *liter = left;
+    // list_ele_t *riter = right;
+    // int lindex = 0;
+    // int rindex = 0;
+
+    // int compare = strcmp(liter->value, riter->value);
+    // if (compare > 0) {
+    //     head = left;
+    //     liter = liter->next;
+    //     lindex++;
+    // } else {
+    //     head = riter;
+    //     riter = riter->next;
+    //     rindex++;
+    // }
+
+    // for (int i = 0; i < size; i++) {
+    //     list_ele_t *result = NULL;
+    //     if (lindex >= lsize) {
+    //         result = riter;
+    //         riter = riter->next;
+    //         rindex++;
+    //     } else if (rindex >= rsize) {
+    //         result = liter;
+    //         liter = liter->next;
+    //         lindex++;
+    //     } else {
+    //         int compare = strcmp(liter->value, riter->value);
+    //         if (compare > 0) {
+    //             head = left;
+    //             liter = liter->next;
+    //             lindex++;
+    //         } else {
+    //             head = riter;
+    //             riter = riter->next;
+    //             rindex++;
+    //         }
+    //     }
+    // }
+}
+
+void mergeSort(queue_t *q)
+{
+    if (!q || !q->head || !q->tail) {
+        return;
+    }
+
+    if (q->size <= 1) {
+        return;
+    }
+
+    int half = q->size >> 1;
+    list_ele_t *mid = q->head;
+    for (int i = 0; i < half; i++) {
+        mid = mid->next;
+    }
+    queue_t left = {.head = q->head, .tail = mid, .size = half};
+
+    queue_t right = {
+        .head = mid,
+        .tail = q->tail,
+        .size = q->size - half,
+    };
+
+    mergeSort(&left);
+    mergeSort(&right);
+    merge(q->head, mid, half, q->size - half);
 }
 
 /*
@@ -216,27 +301,6 @@ int compare(const void *a, const void *b)
  */
 void q_sort(queue_t *q)
 {
-    if (!q) {
-        return;
-    }
-
-    if (q->size == 0 || q->size == 1) {
-        return;
-    }
-
-    int size = q->size;
-    char *iter[size];
-
-    list_ele_t *foo = q->head;
-    for (int i = 0; i < size; i++) {
-        iter[i] = foo->value;
-        foo = foo->next;
-    }
-
-    qsort(iter, size, sizeof(char *), compare);
-    foo = q->head;
-    for (int i = 0; i < size; i++) {
-        foo->value = iter[i];
-        foo = foo->next;
-    }
+    return;
+    // mergeSort(q);
 }
