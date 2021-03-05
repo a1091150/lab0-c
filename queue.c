@@ -202,68 +202,91 @@ void q_reverse(queue_t *q)
     }
 }
 
-// void merge(queue_t *left, queue_t*right){
-//     if (!left || !right){
-//         return;
-//     }
-//     list_ele_t *sourcehead = left->head->prev;
-//     list_ele_t *sourcetail = right->tail->next;
-
-//     int size = left->size + right->size;
-//     for (int i = 0; i < size; i++){
-
-//     }
-// }
-
-void merge(list_ele_t *left, list_ele_t *right, int lsize, int rsize)
+void merge(queue_t *left, queue_t *right)
 {
-    int size = lsize + rsize;
-    if (lsize == 0 || rsize == 0 || size <= 1) {
+    if (!left || !right || left == right) {
         return;
     }
+    queue_t *result = left;
 
-    // list_ele_t *sourceleft = left->prev;
-    // list_ele_t *sourcetail = right->next;
-    // list_ele_t *head = NULL;
-    // list_ele_t *liter = left;
-    // list_ele_t *riter = right;
-    // int lindex = 0;
-    // int rindex = 0;
+    int lsize = left->size;
+    int rsize = right->size;
+    int size = lsize + rsize;
 
-    // int compare = strcmp(liter->value, riter->value);
-    // if (compare > 0) {
-    //     head = left;
-    //     liter = liter->next;
-    //     lindex++;
-    // } else {
-    //     head = riter;
-    //     riter = riter->next;
-    //     rindex++;
-    // }
+    list_ele_t *sourcehead = left->head->prev;
+    list_ele_t *sourcetail = right->tail->next;
 
-    // for (int i = 0; i < size; i++) {
-    //     list_ele_t *result = NULL;
-    //     if (lindex >= lsize) {
-    //         result = riter;
-    //         riter = riter->next;
-    //         rindex++;
-    //     } else if (rindex >= rsize) {
-    //         result = liter;
-    //         liter = liter->next;
-    //         lindex++;
-    //     } else {
-    //         int compare = strcmp(liter->value, riter->value);
-    //         if (compare > 0) {
-    //             head = left;
-    //             liter = liter->next;
-    //             lindex++;
-    //         } else {
-    //             head = riter;
-    //             riter = riter->next;
-    //             rindex++;
-    //         }
-    //     }
-    // }
+    list_ele_t *iter = NULL;
+    list_ele_t *liter = left->head;
+    list_ele_t *riter = right->head;
+    int lindex = 0;
+    int rindex = 0;
+
+    if (strcmp(liter->value, riter->value) < 0) {
+        // L
+        iter = liter;
+        liter = liter->next;
+        lindex++;
+    } else {
+        // R
+        iter = riter;
+        riter = riter->next;
+        rindex++;
+    }
+
+    if (sourcehead) {
+        sourcehead->next = iter;
+        iter->prev = sourcehead;
+    } else {
+        iter->prev = NULL;
+    }
+    result->head = iter;
+
+    for (int i = 1; i < size; i++) {
+        if (lindex >= lsize) {
+            iter->next = riter;
+            riter->prev = iter;
+            iter = riter;
+
+            riter = riter->next;
+            rindex++;
+        } else if (rindex >= rsize) {
+            iter->next = liter;
+            liter->prev = iter;
+            iter = liter;
+
+            liter = liter->next;
+            lindex++;
+        } else {
+            if (strcmp(liter->value, riter->value) < 0) {
+                // L
+                iter->next = liter;
+                liter->prev = iter;
+                iter = liter;
+
+                liter = liter->next;
+                lindex++;
+            } else {
+                // R
+                iter->next = riter;
+                riter->prev = iter;
+                iter = riter;
+
+                riter = riter->next;
+                rindex++;
+            }
+        }
+    }
+
+    if (sourcetail) {
+        iter->next = sourcetail;
+        sourcetail->prev = iter;
+    } else {
+        iter->next = NULL;
+    }
+
+    result->tail = iter;
+    result->size = size;
 }
 
 void mergeSort(queue_t *q)
@@ -281,17 +304,13 @@ void mergeSort(queue_t *q)
     for (int i = 0; i < half; i++) {
         mid = mid->next;
     }
-    queue_t left = {.head = q->head, .tail = mid, .size = half};
-
-    queue_t right = {
-        .head = mid,
-        .tail = q->tail,
-        .size = q->size - half,
-    };
-
+    queue_t left = {.head = q->head, .tail = mid->prev, .size = half};
+    queue_t right = {.head = mid, .tail = q->tail, .size = q->size - half};
     mergeSort(&left);
     mergeSort(&right);
-    merge(q->head, mid, half, q->size - half);
+    merge(&left, &right);
+    q->head = left.head;
+    q->tail = left.tail;
 }
 
 /*
@@ -301,6 +320,5 @@ void mergeSort(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    return;
-    // mergeSort(q);
+    mergeSort(q);
 }
