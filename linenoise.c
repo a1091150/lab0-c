@@ -1279,6 +1279,11 @@ int linenoiseHistorySetMaxLen(int len)
     history_max_len = len;
     if (history_len > history_max_len)
         history_len = history_max_len;
+
+    if (!atexit_registered) {
+        atexit(linenoiseAtExit);
+        atexit_registered = 1;
+    }
     return 1;
 }
 
